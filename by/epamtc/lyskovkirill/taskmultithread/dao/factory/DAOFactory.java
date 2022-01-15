@@ -5,6 +5,7 @@ import by.epamtc.lyskovkirill.taskmultithread.dao.impl.TxtMatrixDAO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,12 +19,16 @@ public class DAOFactory {
     public static DAOFactory getInstance() {
         lock.lock();
         try {
-            if (instance == null && lock.tryLock()) {
-                instance = new DAOFactory();
-            } else {
-                Logger logger = LogManager.getLogger();
-                logger.warn("DAOFactory instance is been already initializing by another thread");
+            if (instance == null) {
+                if (lock.tryLock(10, TimeUnit.SECONDS)) {
+                    instance = new DAOFactory();
+                } else {
+                    Logger logger = LogManager.getLogger();
+                    logger.warn("DAOFactory instance is been already initializing by another thread");
+                }
             }
+        } catch (InterruptedException exception) {
+            throw new RuntimeException(exception.getMessage(), exception);
         } finally {
             lock.unlock();
         }
