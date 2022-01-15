@@ -6,12 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DAOFactory {
     private static final Logger logger = LogManager.getLogger();
-    private static final Lock lock = new ReentrantLock();
+    private static final ReentrantLock lock = new ReentrantLock();
 
     private static DAOFactory instance;
 
@@ -34,7 +33,8 @@ public class DAOFactory {
                 logger.error(exception);
                 throw new RuntimeException(exception.getMessage(), exception);
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread())
+                    lock.unlock();
             }
         }
         return instance;
