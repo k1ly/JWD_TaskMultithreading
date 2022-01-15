@@ -2,16 +2,31 @@ package by.epamtc.lyskovkirill.taskmultithread.dao.factory;
 
 import by.epamtc.lyskovkirill.taskmultithread.dao.MatrixDAO;
 import by.epamtc.lyskovkirill.taskmultithread.dao.impl.TxtMatrixDAO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DAOFactory {
     private static DAOFactory instance;
 
+    private final static Lock lock = new ReentrantLock();
 
     private MatrixDAO matrixDAO = new TxtMatrixDAO();
 
-    public static synchronized DAOFactory getInstance() {
-        if (instance == null)
-            instance = new DAOFactory();
+    public static DAOFactory getInstance() {
+        lock.lock();
+        try {
+            if (instance == null && lock.tryLock()) {
+                instance = new DAOFactory();
+            } else {
+                Logger logger = LogManager.getLogger();
+                logger.warn("DAOFactory instance is been already initializing by another thread");
+            }
+        } finally {
+            lock.unlock();
+        }
         return instance;
     }
 
