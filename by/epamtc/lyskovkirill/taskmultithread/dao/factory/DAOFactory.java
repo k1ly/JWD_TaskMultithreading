@@ -17,20 +17,21 @@ public class DAOFactory {
     private MatrixDAO matrixDAO = new TxtMatrixDAO();
 
     public static DAOFactory getInstance() {
-        lock.lock();
-        try {
-            if (instance == null) {
+        if (instance == null) {
+            try {
                 if (lock.tryLock(10, TimeUnit.SECONDS)) {
-                    instance = new DAOFactory();
-                } else {
-                    Logger logger = LogManager.getLogger();
-                    logger.warn("DAOFactory instance is been already initializing by another thread");
+                    if (instance == null)
+                        instance = new DAOFactory();
+                    else {
+                        Logger logger = LogManager.getLogger();
+                        logger.warn("DAOFactory instance is been already initializing by another thread");
+                    }
                 }
+            } catch (InterruptedException exception) {
+                throw new RuntimeException(exception.getMessage(), exception);
+            } finally {
+                lock.unlock();
             }
-        } catch (InterruptedException exception) {
-            throw new RuntimeException(exception.getMessage(), exception);
-        } finally {
-            lock.unlock();
         }
         return instance;
     }
@@ -39,7 +40,7 @@ public class DAOFactory {
         return matrixDAO;
     }
 
-    public void setMatrixDAO(MatrixDAO matrixDAO) {
+    public synchronized void setMatrixDAO(MatrixDAO matrixDAO) {
         this.matrixDAO = matrixDAO;
     }
 }
