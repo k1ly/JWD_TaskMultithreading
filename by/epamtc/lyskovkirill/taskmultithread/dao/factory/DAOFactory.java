@@ -10,9 +10,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DAOFactory {
-    private static DAOFactory instance;
+    private static final Logger logger = LogManager.getLogger();
+    private static final Lock lock = new ReentrantLock();
 
-    private final static Lock lock = new ReentrantLock();
+    private static DAOFactory instance;
 
     private MatrixDAO matrixDAO = new TxtMatrixDAO();
 
@@ -23,11 +24,14 @@ public class DAOFactory {
                     if (instance == null)
                         instance = new DAOFactory();
                     else {
-                        Logger logger = LogManager.getLogger();
                         logger.warn("DAOFactory instance is been already initializing by another thread");
                     }
+                } else {
+                    logger.error("Timeout exceeded");
+                    throw new RuntimeException("Timeout exceeded");
                 }
             } catch (InterruptedException exception) {
+                logger.error(exception);
                 throw new RuntimeException(exception.getMessage(), exception);
             } finally {
                 lock.unlock();

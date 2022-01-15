@@ -11,8 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class TxtMatrixDAO implements MatrixDAO {
-    private final static String MATRIX_INI_PATH = "resources/matrix.ini";
-    private final static String MATRIX_FILE_PATH = "resources/matrix.txt";
+    private static final String MATRIX_INI_PATH = "resources/matrix.ini";
+    private static final String MATRIX_FILE_PATH = "resources/matrix.txt";
 
     @Override
     public Ini readInitializationData() throws DAOException {

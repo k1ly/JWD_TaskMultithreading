@@ -15,11 +15,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MatrixThread extends Thread {
-    private final static String MATRIX_INI_SECTION = "Matrix";
-    private final static String NUMBER_N_INI_OPTION = "iNumberN";
-    private final static String NUMBER_Y_INI_OPTION = "iNumberY";
+    private static final String MATRIX_INI_SECTION = "Matrix";
+    private static final String NUMBER_N_INI_OPTION = "iNumberN";
+    private static final String NUMBER_Y_INI_OPTION = "iNumberY";
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static int N;
     private static int Y;
